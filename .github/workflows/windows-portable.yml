@@ -42,13 +42,20 @@ jobs:
           ./scripts/security/enable-cloud-validation.ps1
       - uses: actions/checkout@v4
         with:
-          ref: db86b6f1766182d14d7845acc84e74a98836a9be
+          ref: 961fe0ddad0ec5c3c9a422e181262bb457dacfbe
           path: native-source
           persist-credentials: false
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: native-source/src-tauri -> target
           cache-on-failure: true
+      - name: Check WSL error decoding on Windows
+        shell: pwsh
+        run: |
+          rustc --test native-source/src-tauri/src/setup_protocol.rs -o protocol-tests.exe
+          if ($LASTEXITCODE -ne 0) { throw 'Setup protocol tests did not compile.' }
+          ./protocol-tests.exe
+          if ($LASTEXITCODE -ne 0) { throw 'Setup protocol regression failed.' }
       - name: Build portable executable from the reviewed native source
         working-directory: native-source
         run: |
@@ -57,7 +64,7 @@ jobs:
       - run: npm ci
       - name: Package portable app with notices and checksums
         shell: pwsh
-        run: python scripts/package-windows.py --exe native-source/src-tauri/target/release/mimisync.exe --output portable-output --cargo-registry "$env:USERPROFILE/.cargo/registry/src"
+        run: python scripts/package-windows.py --exe native-source/src-tauri/target/release/mimisync.exe --output portable-output --name Mimisync-0.2.0-preview3-windows-x64-portable --cargo-registry "$env:USERPROFILE/.cargo/registry/src"
       - name: Scan and publish exact portable ZIP
         env:
           GH_TOKEN: ${{ github.token }}

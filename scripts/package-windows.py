@@ -83,7 +83,8 @@ with tempfile.TemporaryDirectory(prefix="mimisync-package-") as temporary:
             ignore=shutil.ignore_patterns("__pycache__", "*.egg-info", ".pytest_cache"),
         )
     (staging / "LEIA-ME-PRIMEIRO.txt").write_text(
-        """MIMISYNC 0.2.0 PREVIEW 2 - PORTATIL - WINDOWS 11 x64
+        f"""MIMISYNC 0.2.0 - PORTATIL - WINDOWS 11 x64
+Pacote: {name}
 
 1. Extraia a pasta inteira do ZIP.
 2. Abra Mimisync.exe dentro da pasta extraida, nao dentro do ZIP.

@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
-$tag = 'preview-0.2.0-portable.2'
-$archiveName = 'Mimisync-0.2.0-preview2-windows-x64-portable.zip'
+$tag = 'preview-0.2.0-portable.3'
+$archiveName = 'Mimisync-0.2.0-preview3-windows-x64-portable.zip'
 $report = [ordered]@{
     packagingCommit = $env:GITHUB_SHA
-    applicationCommit = 'db86b6f1766182d14d7845acc84e74a98836a9be'
+    applicationCommit = '961fe0ddad0ec5c3c9a422e181262bb457dacfbe'
     runId = $env:GITHUB_RUN_ID
     executesApplication = $false
     status = 'not_run'
@@ -55,14 +55,14 @@ try {
         ''
         'O backend ainda usa WSL2, Python, FFmpeg e checkpoints. O assistente prepara esses componentes quando necessario, podendo pedir autorizacao de administrador e reinicializacao para o WSL2. Dados ficam no perfil do Windows, fora da pasta portatil. O WebView2 Runtime normalmente ja esta presente no Windows 11.'
         ''
-        'O executavel foi compilado no Windows a partir do mesmo codigo-fonte verificado do preview 2 nativo, e seus bytes finais foram analisados separadamente. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.'
+        'Preview 3 corrige a coleta de mensagens do WSL para exibir a causa completa de falhas na preparacao. Nao promete corrigir uma causa de importacao ainda desconhecida. O executavel foi compilado no Windows a partir do commit revisado e seus bytes finais foram analisados separadamente. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.'
         ''
         "ZIP SHA-256: $hash"
         ''
         'Versao experimental, sem assinatura digital. Interface, preparacao e inferencia NVIDIA ainda precisam de testes em hardware real. O ZIP antigo bloqueado permanece retirado, sem conclusao de falso positivo. Se houver deteccao, mantenha o bloqueio, sem exclusoes ou desativacao do antivirus.'
     )
     $notes -join "`n" | Set-Content scan-report/portable-notes.md -Encoding utf8
-    gh release create $tag $archive scan-report/portable.json scan-report/portable-SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --prerelease --title 'Mimisync — Windows portable preview 2' --notes-file scan-report/portable-notes.md
+    gh release create $tag $archive scan-report/portable.json scan-report/portable-SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --prerelease --title 'Mimisync — Windows portable preview 3' --notes-file scan-report/portable-notes.md
     if ($LASTEXITCODE -ne 0) { throw 'Could not stage portable release.' }
     gh release download $tag --repo $env:GITHUB_REPOSITORY --pattern $archiveName --dir portable-delivery
     if ($LASTEXITCODE -ne 0) { throw 'Could not validate the staged GitHub download.' }
