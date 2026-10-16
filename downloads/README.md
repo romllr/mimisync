@@ -1,7 +1,7 @@
-# Downloads suspensos
+# ZIP antigo retirado
 
-O pacote Windows 0.2.0 foi sinalizado pelo Microsoft Defender como **Trojan:Script/Ulthar.A!ml**, com classificação grave. O download foi retirado enquanto a ocorrência é investigada.
+O ZIP `Mimisync-0.2.0-windows-x64-test.zip` foi retirado após detecção do Defender como **Trojan:Script/Ulthar.A!ml**. Não restaure esse arquivo nem adicione exclusões. A causa do alerta original permanece sem diagnóstico.
 
-Não restaure o arquivo removido pelo Defender, não o execute e não adicione exclusões no antivírus. O alerta ainda não foi classificado como falso positivo.
+O [novo Windows preview 2](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2) usa o instalador nativo atualizado e passou por validação própria do Defender, com proteção em tempo real e em nuvem ativas, sem detecções. O relatório e o hash dos bytes publicados acompanham a Release.
 
-Consulte [o registro da investigação](../docs/SECURITY-INVESTIGATION.md). O arquivo SHA-256 é mantido somente para identificar o pacote afetado; integridade não comprova ausência de malware.
+Consulte [a investigação e suas limitações](../docs/SECURITY-INVESTIGATION.md). O SHA-256 do ZIP antigo permanece somente para identificação, sem autorizar seu uso.

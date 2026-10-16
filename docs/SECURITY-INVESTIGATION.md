@@ -1,6 +1,6 @@
 # Investigação do pacote Windows 0.2.0
 
-Estado: **ZIP original retirado; investigação do alerta original aberta. Candidato nativo atualizado aprovado para publicação somente após repetir a validação completa dos bytes finais.**
+Estado: **ZIP original retirado; causa do alerta original em investigação. Novo preview nativo publicado após validação completa do Defender e do download.**
 
 ## Relato confirmado
 
@@ -64,6 +64,19 @@ Revisão: este resultado permite preparar um **novo preview nativo**, repetindo 
 
 Não há conclusão de falso positivo sobre o ZIP antigo, que permanece retirado. Não há garantia universal de ausência de malware nem validação de uso real de GUI/CUDA. O novo preview permanece sem assinatura Authenticode; a análise antimalware não substitui assinatura de editor nem testes de inferência em hardware NVIDIA.
 
+### Preview 2 publicado: bytes finais e download verificados
+
+[Execução 38931626918](https://github.com/romllr/mimisync/actions/runs/38931626918), [relatório final](security/current-38931626918.json) e [Release](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2).
+
+A compilação nativa final e a varredura passaram, com proteção em tempo real, em nuvem, de downloads e de scripts ativas e conexão MAPS verificada. O workflow baixou o próprio asset do GitHub, conferiu seu SHA-256, marcou sua origem como Internet e o analisou novamente, sem detecções, antes de tornar a Release pública. O relatório preserva o resultado e autoriza somente esse candidato. O instalador público foi também baixado neste ambiente sem execução: tamanho e SHA-256 correspondem ao relatório.
+
+- Instalador: `Mimisync_0.2.0_x64-setup.exe`, 3.170.766 bytes.
+- SHA-256: `b6ccb14f147a53c5e0e4673a1e26b2091bb1fdf7b1690d70f34a6ebbddadecb0`.
+- Fonte: `db86b6f1766182d14d7845acc84e74a98836a9be`.
+- Mecanismo Defender: `1.1.26090.9`; assinaturas: `1.461.56.0`.
+
+Este resultado descreve esses arquivos nesse ambiente de análise. Não prova falso positivo do ZIP original, não garante o comportamento de todos os antivírus nem valida execução da interface ou inferência CUDA. O executável continua sem assinatura Authenticode. Diante de nova detecção, manter o bloqueio e registrar o alerta, sem exclusões.
+
 ## Conclusão atual
 
 ### Melhoria da instalação, sem conclusão sobre o alerta
@@ -76,6 +89,6 @@ Verificação desta alteração: compilação release cruzada `x86_64-pc-windows
 
 - O relato do Defender do usuário permanece válido e sem causa esclarecida.
 - O usuário informou que o bloqueio ocorreu durante o download, antes de extrair/abrir o app. Esse registro não demonstra execução do aplicativo no computador dele.
-- Não há diagnóstico suficiente para declarar o pacote seguro ou falso positivo.
+- Não há diagnóstico suficiente para declarar o ZIP original seguro ou falso positivo. O preview nativo atualizado tem os resultados próprios documentados acima.
 - O ZIP original e sua Release continuam retirados. O novo preview nativo só pode ser publicado pelos requisitos de validação descritos acima; não renomear ou reempacotar o ZIP original para contornar a detecção.
 - A causa do alerta original segue sem diagnóstico. A verificação do candidato atualizado conseguiu ativar as proteções e verificar a conexão com a Microsoft. Nenhuma amostra foi enviada manualmente a um portal de terceiros nesta investigação; o runner usa o envio de amostras seguras do próprio Defender.

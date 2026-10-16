@@ -14,15 +14,15 @@ Aplicativo em desenvolvimento para Windows 11: React + TypeScript + Tauri 2, bac
 - Presets Fast/Balanced/Quality; parâmetros específicos; prévias de 3–15 segundos; fila serial persistente em SQLite; cancelamento de subprocessos e logs.
 - Composição facial executada pelos pipelines oficiais, sem GFPGAN/CodeFormer automático. Exportação H.264/AAC, comparação A/B sincronizada e salvamento nativo de resultados concluídos.
 
-## Downloads temporariamente suspensos
+## Baixar e testar no Windows 11
 
-**Não baixe, restaure nem execute o pacote 0.2.0 enquanto a investigação estiver aberta.**
+[**Baixar instalador — Windows preview 2**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-2/Mimisync_0.2.0_x64-setup.exe) · [Release e relatório do Defender](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2)
 
-O Microsoft Defender sinalizou o ZIP de teste como `Trojan:Script/Ulthar.A!ml` (gravidade alta/grave). Isso é uma detecção de ameaça, não apenas um aviso de aplicativo sem reputação. Ainda não há evidência suficiente para classificar o alerta como falso positivo.
+Abra o instalador e depois o Mimisync. O assistente prepara o backend pelo próprio app, sem CMD. Se precisar habilitar o WSL2, o Windows pede autorização de administrador e pode pedir uma reinicialização. Depois, selecione e instale o modelo pela interface; os checkpoints são baixados separadamente após revisão da licença. É necessário driver NVIDIA compatível e espaço para os ambientes e pesos.
 
-O ZIP foi retirado da pasta de downloads atual e a Release foi colocada em rascunho. A publicação automática de novos executáveis foi suspensa. O código-fonte e o histórico permanecem disponíveis para auditoria. Detalhes e limites das verificações: [registro da investigação](docs/SECURITY-INVESTIGATION.md).
+O novo instalador nativo passou por varredura do Defender atualizado, com proteção em tempo real, de downloads e em nuvem ativas, incluindo verificação do arquivo baixado do GitHub. O relatório e o SHA-256 acompanham a Release. Isso não garante ausência universal de malware nem homologa a inferência em GPU; o preview ainda é experimental e não tem assinatura de editor.
 
-Não crie exclusões no antivírus nem desative suas proteções para testar esta versão.
+**O ZIP antigo `Mimisync-0.2.0-windows-x64-test.zip` permanece retirado:** o Defender o marcou como `Trojan:Script/Ulthar.A!ml`, e a causa desse alerta não foi esclarecida. Não restaure esse arquivo. Se o novo instalador também gerar uma detecção de ameaça, mantenha o bloqueio e informe o alerta; não desative o antivírus nem adicione exclusões. Consulte [a investigação e seus limites](docs/SECURITY-INVESTIGATION.md).
 
 ## Desenvolvimento do desktop (opcional)
 
@@ -32,7 +32,7 @@ O backend é empacotado por `src-tauri/build.rs` dentro do executável. A instal
 
 `npm run tauri -- build --features custom-protocol` gera o instalador NSIS no Windows. `.github/workflows/windows-release.yml` permite gerar instaladores no GitHub Actions. O backend e os pesos não precisam ser preparados na máquina de build: o backend fonte vai embutido, e os pesos são baixados na máquina do usuário após revisão das licenças.
 
-Para desenvolvimento com um Ubuntu pessoal já preparado, o caminho antigo continua disponível explicitamente: `bash scripts/setup-backend.sh` no WSL e `scripts/dev-windows.ps1` no Windows. Esse caminho é opcional para desenvolvedores e não é necessário para testar o ZIP.
+Para desenvolvimento com um Ubuntu pessoal já preparado, o caminho antigo continua disponível explicitamente: `bash scripts/setup-backend.sh` no WSL e `scripts/dev-windows.ps1` no Windows. Esse caminho é opcional para desenvolvedores e não é necessário para usar o instalador de teste.
 
 ## Desenvolvimento e testes no Linux sem GPU
 
@@ -55,7 +55,7 @@ curl -H "Authorization: Bearer $MIMISYNC_TOKEN" http://127.0.0.1:47831/health
 
 Não publique esse token. `MIMISYNC_DATA` pode definir um diretório Linux alternativo; scripts upstream exigem caminhos ASCII sem espaços/metacaracteres. O padrão usa a pasta Linux do usuário, mesmo quando o projeto está em NTFS.
 
-`MIMISYNC_WSL_PROJECT` é somente uma opção de desenvolvimento. O ZIP de teste abre diretamente pelo executável e prepara o runtime dedicado quando necessário; não pressupõe um checkout do projeto na máquina do usuário.
+`MIMISYNC_WSL_PROJECT` é somente uma opção de desenvolvimento. O app instalado prepara o runtime dedicado quando necessário; não pressupõe um checkout do projeto na máquina do usuário.
 
 ## Estrutura
 
