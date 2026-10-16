@@ -16,11 +16,15 @@ Aplicativo em desenvolvimento para Windows 11: React + TypeScript + Tauri 2, bac
 
 ## Baixar e testar no Windows 11
 
+[**Baixar ZIP portátil — sem instalar o app**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-portable.2/Mimisync-0.2.0-preview2-windows-x64-portable.zip) · [Relatório e detalhes do portátil](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-portable.2)
+
+No portátil, extraia a pasta inteira e abra `Mimisync.exe`. Não execute dentro do ZIP. Ele usa o WebView2 Runtime, normalmente já presente no Windows 11. Os dados continuam no perfil do Windows; o WSL2 e os modelos continuam necessários e são preparados pelo assistente. Portanto, o aplicativo dispensa instalador, mas não elimina as dependências de inferência.
+
 [**Baixar instalador — Windows preview 2**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-2/Mimisync_0.2.0_x64-setup.exe) · [Release e relatório do Defender](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2)
 
 Abra o instalador e depois o Mimisync. O assistente prepara o backend pelo próprio app, sem CMD. Se precisar habilitar o WSL2, o Windows pede autorização de administrador e pode pedir uma reinicialização. Depois, selecione e instale o modelo pela interface; os checkpoints são baixados separadamente após revisão da licença. É necessário driver NVIDIA compatível e espaço para os ambientes e pesos.
 
-O novo instalador nativo passou por varredura do Defender atualizado, com proteção em tempo real, de downloads e em nuvem ativas, incluindo verificação do arquivo baixado do GitHub. O relatório e o SHA-256 acompanham a Release. Isso não garante ausência universal de malware nem homologa a inferência em GPU; o preview ainda é experimental e não tem assinatura de editor.
+O instalador nativo e o ZIP portátil passaram por verificações próprias do Defender atualizado, com proteção em tempo real, de downloads e em nuvem ativas, incluindo verificação de cada arquivo baixado do GitHub e dos conteúdos extraídos do ZIP. O relatório e o SHA-256 acompanham a Release. Isso não garante ausência universal de malware nem homologa a inferência em GPU; o preview ainda é experimental e não tem assinatura de editor.
 
 **O ZIP antigo `Mimisync-0.2.0-windows-x64-test.zip` permanece retirado:** o Defender o marcou como `Trojan:Script/Ulthar.A!ml`, e a causa desse alerta não foi esclarecida. Não restaure esse arquivo. Se o novo instalador também gerar uma detecção de ameaça, mantenha o bloqueio e informe o alerta; não desative o antivírus nem adicione exclusões. Consulte [a investigação e seus limites](docs/SECURITY-INVESTIGATION.md).
 

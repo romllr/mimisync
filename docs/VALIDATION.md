@@ -19,6 +19,13 @@
 - Download do instalador pelo GitHub conferido por SHA-256 e analisado novamente antes da publicação, sem detecções. [Relatório exato do preview 2](security/current-38931626918.json).
 - Nenhum executável do app foi iniciado nessa análise; GUI, preparação completa e inferência permanecem abaixo como não homologadas.
 
+## Portátil Windows
+
+- Compilação nativa a partir do commit revisado e empacotamento ZIP aprovados. O app não precisa de instalador; o backend continua usando WSL2 e os dados ficam no perfil do Windows.
+- ZIP e conteúdos extraídos analisados pelo Defender com proteção em tempo real e em nuvem ativas, sem detecções, incluindo download pelo GitHub. [Relatório do portátil](security/portable-38935119716.json).
+- Download público, CRC e hashes de todos os arquivos do manifesto conferidos. Imports do PE inspecionados: DLLs do Windows, sem loader WebView2 externo; o WebView2 Runtime continua necessário.
+- Isso não representa teste de abertura da GUI, preparação integral do WSL ou inferência CUDA.
+
 ## Ainda precisa de homologação
 
 - Instalação completa dos três ambientes CUDA e dos checkpoints, seguida de inferência de cada versão em GPU NVIDIA. Os testes dos argumentos não substituem essa execução.

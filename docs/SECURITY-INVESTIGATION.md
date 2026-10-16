@@ -92,3 +92,18 @@ Verificação desta alteração: compilação release cruzada `x86_64-pc-windows
 - Não há diagnóstico suficiente para declarar o ZIP original seguro ou falso positivo. O preview nativo atualizado tem os resultados próprios documentados acima.
 - O ZIP original e sua Release continuam retirados. O novo preview nativo só pode ser publicado pelos requisitos de validação descritos acima; não renomear ou reempacotar o ZIP original para contornar a detecção.
 - A causa do alerta original segue sem diagnóstico. A verificação do candidato atualizado conseguiu ativar as proteções e verificar a conexão com a Microsoft. Nenhuma amostra foi enviada manualmente a um portal de terceiros nesta investigação; o runner usa o envio de amostras seguras do próprio Defender.
+
+## Versão portátil do preview 2
+
+[Release portátil](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-portable.2), [execução 38935119716](https://github.com/romllr/mimisync/actions/runs/38935119716) e [relatório exato](security/portable-38935119716.json).
+
+O portátil foi compilado com a toolchain Windows nativa a partir do mesmo commit de aplicação revisado (`db86b6f1766182d14d7845acc84e74a98836a9be`). Os bytes finais foram verificados separadamente; não se atribui a este build o resultado de outro executável. O ZIP e os conteúdos extraídos passaram por varredura do Defender atualizado, com proteção em tempo real, de downloads/scripts e em nuvem ativas e conexão MAPS verificada. O asset foi baixado do GitHub em rascunho, conferido por SHA-256, extraído e analisado de novo antes da publicação. Não houve detecções.
+
+- Arquivo: `Mimisync-0.2.0-preview2-windows-x64-portable.zip`, 5.511.125 bytes.
+- SHA-256: `c9cdbc2f47b37c9c1c0f7dcc8e5d4fabdbc43e0308f4b990d07c280224a54251`.
+- O download público foi conferido neste ambiente sem execução: CRC do ZIP, todos os hashes do manifesto e presença do executável correspondem. São 620 entradas.
+- A tabela de imports do PE foi inspecionada: somente DLLs do Windows, sem dependência de `WebView2Loader.dll` externo ou VC++ Redistributable adicional. O WebView2 Runtime continua necessário, normalmente presente no Windows 11.
+- A aplicação dispensa instalador; dados permanecem no perfil do Windows. WSL2, ambientes Python/FFmpeg e modelos continuam necessários e são preparados pelo assistente. Não é um ambiente de inferência independente de instalações.
+- A interface e a inferência CUDA não foram executadas nessa análise; o aplicativo continua experimental e sem assinatura digital.
+
+Tentativas anteriores foram preservadas nos relatórios `portable-diagnostic-*.json`: a extração do instalador não encontrou um único executável com o hash esperado; outra máquina falhou na conexão MAPS (`0x80508015`); um erro de sintaxe no script impediu outra análise de iniciar. Nenhuma dessas tentativas publicou um portátil nem equivale a uma detecção de ameaça. O fluxo final usa compilação direta, atualização de assinaturas e inicialização da política antes do teste de conexão, além de validar a sintaxe dos scripts antes da compilação. O ZIP original bloqueado permanece retirado, sem diagnóstico de falso positivo.
