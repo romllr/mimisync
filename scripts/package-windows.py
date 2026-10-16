@@ -5,6 +5,8 @@ Does not bundle model weights, Python environments or a WSL distribution.
 
 import argparse
 import hashlib
+import re
+import struct
 import shutil
 import tempfile
 import zipfile
@@ -15,23 +17,65 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--exe",
     type=Path,
-    default=ROOT / "src-tauri/target/x86_64-pc-windows-gnu/release/mimisync.exe",
+    default=ROOT / "src-tauri/target/release/mimisync.exe",
 )
 parser.add_argument("--output", type=Path, default=ROOT / "releases")
 parser.add_argument("--cargo-registry", type=Path)
+parser.add_argument("--name", default="Mimisync-0.2.0-preview2-windows-x64-portable")
 args = parser.parse_args()
 if not args.exe.is_file() or args.exe.read_bytes()[:2] != b"MZ":
     raise SystemExit("A Windows PE release executable is required.")
 args.output.mkdir(parents=True, exist_ok=True)
-name = "Mimisync-0.2.0-windows-x64-test"
+name = args.name
+if not re.fullmatch(r"[A-Za-z0-9_.-]+", name) or name in (".", ".."):
+    raise SystemExit("A simple archive name is required.")
+
+
+def imported_dlls(path):
+    """Read the PE import table without executing the application."""
+    data = path.read_bytes()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    if data[pe : pe + 4] != b"PE\0\0":
+        raise ValueError("Invalid PE signature")
+    sections, optional_size = struct.unpack_from("<H12xH", data, pe + 6)
+    optional = pe + 24
+    magic = struct.unpack_from("<H", data, optional)[0]
+    if magic not in (0x10B, 0x20B):
+        raise ValueError("Unsupported PE optional header")
+    directories = optional + (112 if magic == 0x20B else 96)
+    import_rva = struct.unpack_from("<I", data, directories + 8)[0]
+    table = optional + optional_size
+
+    def offset(rva):
+        for i in range(sections):
+            size, address, raw_size, raw = struct.unpack_from("<IIII", data, table + i * 40 + 8)
+            if address <= rva < address + max(size, raw_size):
+                return raw + rva - address
+        raise ValueError("PE address outside sections")
+
+    if not import_rva:
+        return []
+    cursor = offset(import_rva)
+    names = []
+    while any(data[cursor : cursor + 20]):
+        name_rva = struct.unpack_from("<I", data, cursor + 12)[0]
+        start = offset(name_rva)
+        names.append(data[start : data.index(b"\0", start)].decode("ascii"))
+        cursor += 20
+    return names
+
+
+imports = imported_dlls(args.exe)
+print("Imported DLLs:", ", ".join(imports))
 with tempfile.TemporaryDirectory(prefix="mimisync-package-") as temporary:
     staging = Path(temporary) / name
     staging.mkdir()
     shutil.copy2(args.exe, staging / "Mimisync.exe")
     loader = args.exe.with_name("WebView2Loader.dll")
-    if not loader.is_file():
-        raise SystemExit("WebView2Loader.dll must be beside the release executable.")
-    shutil.copy2(loader, staging / "WebView2Loader.dll")
+    if "webview2loader.dll" in {dll.lower() for dll in imports}:
+        if not loader.is_file():
+            raise SystemExit("This executable requires WebView2Loader.dll beside it.")
+        shutil.copy2(loader, staging / "WebView2Loader.dll")
     for relative in ("docs",):
         shutil.copytree(
             ROOT / relative,
@@ -39,13 +83,16 @@ with tempfile.TemporaryDirectory(prefix="mimisync-package-") as temporary:
             ignore=shutil.ignore_patterns("__pycache__", "*.egg-info", ".pytest_cache"),
         )
     (staging / "LEIA-ME-PRIMEIRO.txt").write_text(
-        """MIMISYNC 0.2.0 - WINDOWS 11 x64 - TESTE EXPERIMENTAL
+        """MIMISYNC 0.2.0 PREVIEW 2 - PORTATIL - WINDOWS 11 x64
 
 1. Extraia a pasta inteira do ZIP.
-2. Abra Mimisync.exe. Deixe WebView2Loader.dll ao lado dele.
+2. Abra Mimisync.exe dentro da pasta extraida, nao dentro do ZIP.
 3. Siga o assistente que aparece dentro do app.
 
-Nao precisa instalar Node/Rust nem digitar comandos para preparar o backend.
+Nao precisa instalar o aplicativo, Node/Rust nem digitar comandos.
+O WebView2 Runtime normalmente ja esta presente no Windows 11.
+Esta e uma versao sem instalador do app, nao um ambiente sem dependencias.
+Os dados ficam no perfil do Windows; os modelos e ambientes nao ficam no ZIP.
 O app prepara Python/FFmpeg em um ambiente WSL2 exclusivo do Mimisync.
 Se o Windows pedir autorizacao de administrador ou reinicializacao, conclua
 essa etapa e abra o Mimisync novamente. Ele nao reinicia o PC sozinho.
