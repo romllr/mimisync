@@ -1,0 +1,62 @@
+name: Validate current Windows package (no distribution)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/validate-current-windows.yml
+      - scripts/security/scan-current.ps1
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Build current source with the native Windows toolchain
+        run: npm run tauri -- build --features custom-protocol
+      - name: Scan current binaries without executing them
+        if: always()
+        shell: pwsh
+        run: ./scripts/security/scan-current.ps1
+      - name: Preserve JSON only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-windows-security-report
+          path: scan-report/current.json
+          if-no-files-found: error
+  record:
+    needs: validate
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: current-windows-security-report
+          path: report
+      - name: Record the result without publishing executables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          raw = Path('report/current.json').read_bytes()
+          data = json.loads(raw.decode('utf-8-sig'))
+          assert data['sourceCommit'] == os.environ['GITHUB_SHA']
+          payload = {'message': 'Record current Windows validation '+os.environ['GITHUB_RUN_ID'], 'content': base64.b64encode(raw).decode('ascii')}
+          Path('payload.json').write_text(json.dumps(payload))
+          PY
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/docs/security/current-$GITHUB_RUN_ID.json" --input payload.json --jq '{path: .content.path, commit: .commit.sha}'
