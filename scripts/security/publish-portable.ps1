@@ -50,17 +50,18 @@ try {
     $report.status = 'scanned_no_detections_pending_delivery_verification'
     $report | ConvertTo-Json -Depth 8 | Set-Content scan-report/portable.json -Encoding utf8
     "$hash  $archiveName" | Set-Content scan-report/portable-SHA256SUMS.txt -Encoding ascii
-    @"
-    Versao portatil para Windows 11 x64: extraia a pasta inteira e abra Mimisync.exe. Nao requer instalar o aplicativo ou usar CMD.
-
-    O backend ainda usa WSL2, Python, FFmpeg e checkpoints. O assistente prepara esses componentes quando necessario, podendo pedir autorizacao de administrador e reinicializacao para o WSL2. Dados ficam no perfil do Windows, fora da pasta portatil. O WebView2 Runtime normalmente ja esta presente no Windows 11.
-
-    O executavel foi compilado no Windows a partir do mesmo codigo-fonte verificado do preview 2 nativo, e seus bytes finais foram analisados separadamente. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.
-
-    ZIP SHA-256: $hash
-
-    Versao experimental, sem assinatura digital. Interface, preparacao e inferencia NVIDIA ainda precisam de testes em hardware real. O ZIP antigo bloqueado permanece retirado, sem conclusao de falso positivo. Se houver deteccao, mantenha o bloqueio, sem exclusoes ou desativacao do antivirus.
-    "@ | Set-Content scan-report/portable-notes.md -Encoding utf8
+    $notes = @(
+        'Versao portatil para Windows 11 x64: extraia a pasta inteira e abra Mimisync.exe. Nao requer instalar o aplicativo ou usar CMD.'
+        ''
+        'O backend ainda usa WSL2, Python, FFmpeg e checkpoints. O assistente prepara esses componentes quando necessario, podendo pedir autorizacao de administrador e reinicializacao para o WSL2. Dados ficam no perfil do Windows, fora da pasta portatil. O WebView2 Runtime normalmente ja esta presente no Windows 11.'
+        ''
+        'O executavel foi compilado no Windows a partir do mesmo codigo-fonte verificado do preview 2 nativo, e seus bytes finais foram analisados separadamente. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.'
+        ''
+        "ZIP SHA-256: $hash"
+        ''
+        'Versao experimental, sem assinatura digital. Interface, preparacao e inferencia NVIDIA ainda precisam de testes em hardware real. O ZIP antigo bloqueado permanece retirado, sem conclusao de falso positivo. Se houver deteccao, mantenha o bloqueio, sem exclusoes ou desativacao do antivirus.'
+    )
+    $notes -join "`n" | Set-Content scan-report/portable-notes.md -Encoding utf8
     gh release create $tag $archive scan-report/portable.json scan-report/portable-SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --prerelease --title 'Mimisync — Windows portable preview 2' --notes-file scan-report/portable-notes.md
     if ($LASTEXITCODE -ne 0) { throw 'Could not stage portable release.' }
     gh release download $tag --repo $env:GITHUB_REPOSITORY --pattern $archiveName --dir portable-delivery
