@@ -1,6 +1,6 @@
 # Investigação do pacote Windows 0.2.0
 
-Estado: **investigação aberta; downloads suspensos**.
+Estado: **ZIP original retirado; investigação do alerta original aberta. Candidato nativo atualizado aprovado para publicação somente após repetir a validação completa dos bytes finais.**
 
 ## Relato confirmado
 
@@ -54,6 +54,16 @@ O código atualizado foi compilado no Windows com a toolchain nativa. O instalad
 
 Uma verificação adicional foi preparada com proteção em tempo real, proteção de downloads/scripts, MAPS e bloqueio à primeira vista habilitados no runner isolado. Ela exige que `MpCmdRun -ValidateMapsConnection` confirme a conexão com o serviço da Microsoft. O consentimento de envio de amostras seguras é restrito a esse runner, que contém código público do projeto, sem os vídeos do usuário. Se esses requisitos não forem verificáveis, o relatório deve indicar a limitação e falhar, sem publicar executáveis.
 
+### App atualizado: proteção em tempo real e nuvem verificadas
+
+[Execução 38930626131](https://github.com/romllr/mimisync/actions/runs/38930626131) e [relatório JSON](security/current-38930626131.json).
+
+O Defender atualizado analisou o executável e o instalador nativo do código `db86b6f1766182d14d7845acc84e74a98836a9be`, sem executar o app e sem detectar ameaças. A proteção em tempo real estava ativa. MAPS avançado, bloqueio à primeira vista, proteção de downloads e de scripts estavam habilitados. `MpCmdRun -ValidateMapsConnection` confirmou conexão com o serviço da Microsoft (código 0). Não houve erro de configuração nem arquivos removidos. Os hashes desse build estão no relatório.
+
+Revisão: este resultado permite preparar um **novo preview nativo**, repetindo os mesmos requisitos de proteção sobre os arquivos efetivamente publicados. O workflow de publicação seleciona esse commit explicitamente, recompila, analisa os bytes finais, confere SHA-256, cria uma Release em rascunho, baixa o próprio asset do GitHub, confere seu hash e o analisa novamente antes de tornar a Release pública. Qualquer falha mantém o candidato sem publicação pública. A seleção fica registrada em `scripts/security/approved-release.json`.
+
+Não há conclusão de falso positivo sobre o ZIP antigo, que permanece retirado. Não há garantia universal de ausência de malware nem validação de uso real de GUI/CUDA. O novo preview permanece sem assinatura Authenticode; a análise antimalware não substitui assinatura de editor nem testes de inferência em hardware NVIDIA.
+
 ## Conclusão atual
 
 ### Melhoria da instalação, sem conclusão sobre o alerta
@@ -67,5 +77,5 @@ Verificação desta alteração: compilação release cruzada `x86_64-pc-windows
 - O relato do Defender do usuário permanece válido e sem causa esclarecida.
 - O usuário informou que o bloqueio ocorreu durante o download, antes de extrair/abrir o app. Esse registro não demonstra execução do aplicativo no computador dele.
 - Não há diagnóstico suficiente para declarar o pacote seguro ou falso positivo.
-- Os downloads e a publicação automática permanecem suspensos. Não substituir o pacote por outro build nem mudar nome/empacotamento para contornar a detecção.
-- A investigação precisa de condições de proteção equivalentes às do cliente ou de análise do fornecedor do antivírus antes de uma decisão de liberação. Nenhuma amostra foi enviada manualmente a um portal de terceiros nesta investigação.
+- O ZIP original e sua Release continuam retirados. O novo preview nativo só pode ser publicado pelos requisitos de validação descritos acima; não renomear ou reempacotar o ZIP original para contornar a detecção.
+- A causa do alerta original segue sem diagnóstico. A verificação do candidato atualizado conseguiu ativar as proteções e verificar a conexão com a Microsoft. Nenhuma amostra foi enviada manualmente a um portal de terceiros nesta investigação; o runner usa o envio de amostras seguras do próprio Defender.

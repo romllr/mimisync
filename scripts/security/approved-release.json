@@ -1,0 +1,6 @@
+{
+  "source": "db86b6f1766182d14d7845acc84e74a98836a9be",
+  "tag": "preview-0.2.0-2",
+  "reviewedReport": "docs/security/current-38930626131.json",
+  "scope": "Updated native Windows preview only; original blocked ZIP remains withdrawn. Repeat full protection and exact-download validation before publication."
+}

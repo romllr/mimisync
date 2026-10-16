@@ -1,0 +1,95 @@
+name: Publish scanned Windows preview
+on:
+  push:
+    branches: [main]
+    paths: [scripts/security/approved-release.json]
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read reviewed source selection
+        id: selection
+        shell: pwsh
+        run: |
+          $selection = Get-Content scripts/security/approved-release.json -Raw | ConvertFrom-Json
+          if ($selection.source -notmatch '^[a-f0-9]{40}$' -or $selection.tag -notmatch '^preview-[a-zA-Z0-9.-]+$') { throw 'Invalid reviewed source selection.' }
+          "source=$($selection.source)" >> $env:GITHUB_OUTPUT
+          "tag=$($selection.tag)" >> $env:GITHUB_OUTPUT
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.selection.outputs.source }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Verify cloud protection
+        shell: pwsh
+        run: ./scripts/security/enable-cloud-validation.ps1
+      - run: npm ci
+      - run: npm run tauri -- build --features custom-protocol
+      - name: Scan the exact release binaries
+        shell: pwsh
+        run: |
+          $env:GITHUB_SHA = '${{ steps.selection.outputs.source }}'
+          ./scripts/security/scan-current.ps1
+      - name: Publish only the exact scanned installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.selection.outputs.tag }}
+          SOURCE_COMMIT: ${{ steps.selection.outputs.source }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $report = Get-Content scan-report/current.json -Raw | ConvertFrom-Json
+          if ($report.sourceCommit -ne $env:SOURCE_COMMIT -or $report.status -ne 'no_detections_realtime_and_cloud_verified_requires_review' -or $report.detections.Count -ne 0 -or -not $report.engine.RealTimeProtectionEnabled -or -not $report.cloudValidation.configured) { throw 'Security validation did not pass.' }
+          $installer = @($report.files | Where-Object { $_.name -like '*-setup.exe' })
+          if ($installer.Count -ne 1) { throw 'Exactly one scanned installer is required.' }
+          $path = Join-Path scan-input $installer[0].name
+          $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne $installer[0].sha256) { throw 'Installer bytes changed after scanning.' }
+          $report.distributionAuthorized = $true
+          $report | ConvertTo-Json -Depth 8 | Set-Content scan-report/current.json -Encoding utf8
+          @"
+          Windows 11 x64 preview with in-app backend preparation and native Windows administrator consent.
+
+          Built from source $env:SOURCE_COMMIT on GitHub Windows. This exact installer was scanned without detections by updated Microsoft Defender with real-time, download and cloud protection enabled and MAPS connectivity verified. The attached JSON records the checks. This does not establish that the old blocked ZIP was a false positive.
+
+          SHA-256: $hash
+
+          The app is unsigned. Windows GUI setup and NVIDIA inference still require validation on real hardware. If Defender reports a threat, keep the file blocked and report the detection; do not disable protection or add an exclusion. The original ZIP remains withdrawn.
+          "@ | Set-Content scan-report/release-notes.md -Encoding utf8
+          "$hash  $($installer[0].name)" | Set-Content scan-report/SHA256SUMS.txt -Encoding ascii
+          gh release create $env:RELEASE_TAG $path scan-report/current.json scan-report/SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:SOURCE_COMMIT --draft --prerelease --title 'Mimisync 0.2.0 — Windows preview 2' --notes-file scan-report/release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Could not stage the scanned release.' }
+          # Verify the staged GitHub download before making the release public.
+          gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --pattern $installer[0].name --dir downloaded-validation
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify the staged GitHub asset.' }
+          $download = Join-Path downloaded-validation $installer[0].name
+          if ((Get-FileHash -LiteralPath $download -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { throw 'GitHub download checksum mismatch.' }
+          Set-Content -LiteralPath $download -Stream Zone.Identifier -Value "[ZoneTransfer]`r`nZoneId=3"
+          $downloadRoot = (Resolve-Path downloaded-validation).Path
+          Start-MpScan -ScanType CustomScan -ScanPath $downloadRoot
+          $downloadThreats = @(Get-MpThreatDetection | Where-Object { $_.Resources -match [regex]::Escape($downloadRoot) })
+          if ($downloadThreats.Count -gt 0 -or -not (Test-Path $download)) { throw 'Defender detected or removed the staged GitHub download. Release remains draft.' }
+          $report | Add-Member -NotePropertyName githubDownloadValidation -NotePropertyValue ([ordered]@{ sha256 = $hash; detections = $downloadThreats.Count; status = 'downloaded_bytes_match_and_no_detections' })
+          $report | ConvertTo-Json -Depth 8 | Set-Content scan-report/current.json -Encoding utf8
+          gh release upload $env:RELEASE_TAG scan-report/current.json --clobber --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { throw 'Could not preserve delivery validation.' }
+          gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --draft=false
+          if ($LASTEXITCODE -ne 0) { throw 'Could not publish the scanned release.' }
+      - name: Preserve JSON even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-preview-security-report
+          path: scan-report/current.json
+          if-no-files-found: warn
