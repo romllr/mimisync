@@ -14,24 +14,15 @@ Aplicativo em desenvolvimento para Windows 11: React + TypeScript + Tauri 2, bac
 - Presets Fast/Balanced/Quality; parâmetros específicos; prévias de 3–15 segundos; fila serial persistente em SQLite; cancelamento de subprocessos e logs.
 - Composição facial executada pelos pipelines oficiais, sem GFPGAN/CodeFormer automático. Exportação H.264/AAC, comparação A/B sincronizada e salvamento nativo de resultados concluídos.
 
-## Para abrir e testar no Windows
+## Downloads temporariamente suspensos
 
-Baixe o [ZIP Windows 0.2.0](https://github.com/romllr/mimisync/raw/refs/heads/main/downloads/Mimisync-0.2.0-windows-x64-test.zip) ou abra a [Release 0.2.0](https://github.com/romllr/mimisync/releases/tag/v0.2.0), extraia a pasta inteira e abra **Mimisync.exe**. Mantenha `WebView2Loader.dll` ao lado do executável.
+**Não baixe, restaure nem execute o pacote 0.2.0 enquanto a investigação estiver aberta.**
 
-**Não precisa abrir CMD, configurar Python, instalar Node/Rust ou preparar o backend manualmente.**
+O Microsoft Defender sinalizou o ZIP de teste como `Trojan:Script/Ulthar.A!ml` (gravidade alta/grave). Isso é uma detecção de ameaça, não apenas um aviso de aplicativo sem reputação. Ainda não há evidência suficiente para classificar o alerta como falso positivo.
 
-Na primeira abertura:
+O ZIP foi retirado da pasta de downloads atual e a Release foi colocada em rascunho. A publicação automática de novos executáveis foi suspensa. O código-fonte e o histórico permanecem disponíveis para auditoria. Detalhes e limites das verificações: [registro da investigação](docs/SECURITY-INVESTIGATION.md).
 
-1. O assistente verifica os componentes do Windows. Se necessário, clique em **Habilitar componentes do Windows**. O próprio Windows pede autorização de administrador e pode solicitar reinicialização; depois abra o Mimisync novamente.
-2. Clique em **Instalar componentes necessários**. O app baixa a imagem oficial Ubuntu 22.04 (com verificação SHA-256), cria a distribuição WSL2 exclusiva `Mimisync-Ubuntu` e instala FFmpeg, Python e o backend embutido no executável.
-3. O estúdio abre na página de modelos. Revise as licenças, selecione **Instalar modelo** no MuseTalk 1.5 e aguarde. O app prepara o ambiente isolado e baixa os checkpoints em sequência.
-4. Importe vídeo e áudio e comece por uma prévia curta.
-
-Requer Windows 11 x64, virtualização/WSL2, WebView2, internet para a primeira instalação e GPU NVIDIA com driver atualizado e VRAM suficiente. A instalação não baixa um driver NVIDIA nem altera a configuração de BIOS. Os pesos de IA podem ocupar vários GB; reserve pelo menos 20 GB por modelo. MuseTalk ~6 GB de VRAM é estimativa de triagem; LatentSync 1.5 exige 8 GB e 1.6 exige 18 GB segundo os autores.
-
-O app controla somente sua distribuição WSL dedicada. Instalações pessoais do Ubuntu não são usadas para o fluxo de teste. O backend fica em `/opt/mimisync`, os modelos e trabalhos em `/home/mimisync/.local/share/mimisync` e os arquivos de preparação/logs do Windows em `%LOCALAPPDATA%/app.mimisync.desktop`. A interface mostra erros e permite repetir a preparação ou reparar os componentes sem comandos manuais.
-
-**A instalação assistida e a inferência ainda precisam da homologação de vocês no Windows real.** A compilação cruzada não substitui esse teste. Não há inferência simulada nem promessa de qualidade comercial sem avaliação.
+Não crie exclusões no antivírus nem desative suas proteções para testar esta versão.
 
 ## Desenvolvimento do desktop (opcional)
 

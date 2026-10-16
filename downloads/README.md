@@ -1,9 +1,7 @@
-# Download para Windows 11 x64
+# Downloads suspensos
 
-[**Baixar Mimisync 0.2.0 — ZIP de teste (9,2 MB)**](https://github.com/romllr/mimisync/raw/refs/heads/main/downloads/Mimisync-0.2.0-windows-x64-test.zip)
+O pacote Windows 0.2.0 foi sinalizado pelo Microsoft Defender como **Trojan:Script/Ulthar.A!ml**, com classificação grave. O download foi retirado enquanto a ocorrência é investigada.
 
-Extraia a pasta inteira e abra **Mimisync.exe**. O assistente prepara o backend dentro do app. Não precisa abrir CMD ou configurar Python.
+Não restaure o arquivo removido pelo Defender, não o execute e não adicione exclusões no antivírus. O alerta ainda não foi classificado como falso positivo.
 
-O Windows pode pedir autorização de administrador e uma reinicialização para habilitar WSL2. Precisa de NVIDIA, WebView2 e internet para a instalação inicial e os checkpoints.
-
-Versão experimental: instalação completa e inferência ainda precisam da homologação no Windows real. SHA-256 ao lado do ZIP e hashes internos incluídos no pacote.
+Consulte [o registro da investigação](../docs/SECURITY-INVESTIGATION.md). O arquivo SHA-256 é mantido somente para identificar o pacote afetado; integridade não comprova ausência de malware.
