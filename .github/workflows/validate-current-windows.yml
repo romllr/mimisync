@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/validate-current-windows.yml
       - scripts/security/scan-current.ps1
+      - scripts/security/enable-cloud-validation.ps1
 permissions:
   contents: read
 jobs:
@@ -20,6 +21,9 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+      - name: Enable and verify Defender cloud protection on the isolated runner
+        shell: pwsh
+        run: ./scripts/security/enable-cloud-validation.ps1
       - run: npm ci
       - name: Build current source with the native Windows toolchain
         run: npm run tauri -- build --features custom-protocol

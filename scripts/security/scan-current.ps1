@@ -9,6 +9,7 @@ $report = [ordered]@{
     engine = $null
     protectionEnableError = $null
     cloudSettings = $null
+    cloudValidation = $null
     files = @()
     detections = @()
     threats = @()
@@ -16,6 +17,7 @@ $report = [ordered]@{
 }
 $exitCode = 1
 try {
+    $report.cloudValidation = Get-Content scan-report/cloud.json -Raw | ConvertFrom-Json
     # Enable protection if the hosted machine permits it. Never weaken policies.
     try { Set-MpPreference -DisableRealtimeMonitoring $false } catch {
         $report.protectionEnableError = $_.Exception.Message
@@ -23,7 +25,7 @@ try {
     Update-MpSignature
     $status = Get-MpComputerStatus
     $report.engine = $status | Select-Object AMServiceEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AMProductVersion,AMEngineVersion,AntivirusSignatureVersion,AntivirusSignatureLastUpdated,DefenderSignaturesOutOfDate
-    $report.cloudSettings = Get-MpPreference | Select-Object MAPSReporting,SubmitSamplesConsent,DisableBlockAtFirstSeen,CloudBlockLevel
+    $report.cloudSettings = Get-MpPreference | Select-Object MAPSReporting,SubmitSamplesConsent,DisableBlockAtFirstSeen,CloudBlockLevel,DisableIOAVProtection,DisableScriptScanning
     if (-not $status.AntivirusEnabled -or -not $status.AMServiceEnabled -or $status.DefenderSignaturesOutOfDate) {
         throw 'Defender is unavailable or signatures are stale.'
     }
@@ -58,7 +60,11 @@ try {
         $report.status = 'on_demand_no_detections_realtime_unavailable'
         throw 'On-demand scan reported no detections, but real-time download protection could not be reproduced. This is not clearance for distribution.'
     }
-    $report.status = 'no_detections_on_this_runner_requires_review'
+    if (-not $report.cloudValidation.configured -or $report.cloudSettings.MAPSReporting -eq 0 -or $report.cloudSettings.DisableBlockAtFirstSeen -or $report.cloudSettings.DisableIOAVProtection -or $report.cloudSettings.DisableScriptScanning) {
+        $report.status = 'on_demand_no_detections_cloud_validation_unavailable'
+        throw 'Cloud/download protection validation was incomplete. Distribution remains suspended.'
+    }
+    $report.status = 'no_detections_realtime_and_cloud_verified_requires_review'
     $exitCode = 0
 } catch {
     $report.error = $_.Exception.Message
