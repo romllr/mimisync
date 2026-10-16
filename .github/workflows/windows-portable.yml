@@ -26,27 +26,20 @@ jobs:
       - name: Enable and verify Defender protection
         shell: pwsh
         run: ./scripts/security/enable-cloud-validation.ps1
-      - name: Extract the reviewed native executable without running the installer
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: pwsh
+      - uses: actions/checkout@v4
+        with:
+          ref: db86b6f1766182d14d7845acc84e74a98836a9be
+          path: native-source
+          persist-credentials: false
+      - name: Build portable executable from the reviewed native source
+        working-directory: native-source
         run: |
-          $ErrorActionPreference = 'Stop'
-          gh release download preview-0.2.0-2 --repo $env:GITHUB_REPOSITORY --pattern Mimisync_0.2.0_x64-setup.exe --dir upstream
-          if ($LASTEXITCODE -ne 0) { throw 'Could not retrieve the verified upstream installer.' }
-          if ((Get-FileHash upstream/Mimisync_0.2.0_x64-setup.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b6ccb14f147a53c5e0e4673a1e26b2091bb1fdf7b1690d70f34a6ebbddadecb0') { throw 'Upstream installer checksum mismatch.' }
-          7z x upstream/Mimisync_0.2.0_x64-setup.exe -oupstream-extracted -y
-          if ($LASTEXITCODE -ne 0) { throw 'Could not extract the installer without executing it.' }
-          $app = @(Get-ChildItem upstream-extracted -Recurse -Filter '*.exe' | Where-Object { (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -eq '3035f095f9536e472e7725e2aaaeaa50d7e9bc5d2f0299015bcb07aaa2cf8db5' })
-          if ($app.Count -ne 1) { throw 'Exactly one reviewed native application must be found.' }
-          New-Item -ItemType Directory -Path portable-native -Force | Out-Null
-          Copy-Item $app[0].FullName portable-native/mimisync.exe
+          npm ci
+          npm run tauri -- build --features custom-protocol
       - run: npm ci
-      - name: Retrieve dependency license files
-        run: cargo fetch --locked --manifest-path src-tauri/Cargo.toml
       - name: Package portable app with notices and checksums
         shell: pwsh
-        run: python scripts/package-windows.py --exe portable-native/mimisync.exe --output portable-output --cargo-registry "$env:USERPROFILE/.cargo/registry/src"
+        run: python scripts/package-windows.py --exe native-source/src-tauri/target/release/mimisync.exe --output portable-output --cargo-registry "$env:USERPROFILE/.cargo/registry/src"
       - name: Scan and publish exact portable ZIP
         env:
           GH_TOKEN: ${{ github.token }}

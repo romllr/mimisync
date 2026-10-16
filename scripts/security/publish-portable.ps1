@@ -32,11 +32,14 @@ try {
     $report.engine = $status | Select-Object AMServiceEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AMEngineVersion,AntivirusSignatureVersion,DefenderSignaturesOutOfDate
     $report.cloudSettings = Get-MpPreference | Select-Object MAPSReporting,SubmitSamplesConsent,DisableBlockAtFirstSeen,DisableIOAVProtection,DisableScriptScanning
     if (-not $status.RealTimeProtectionEnabled -or -not $status.AntivirusEnabled -or -not $status.AMServiceEnabled -or $status.DefenderSignaturesOutOfDate -or -not $report.cloudValidation.configured -or $report.cloudSettings.MAPSReporting -eq 0 -or $report.cloudSettings.SubmitSamplesConsent -notin @(1,3) -or $report.cloudSettings.DisableBlockAtFirstSeen -or $report.cloudSettings.DisableIOAVProtection -or $report.cloudSettings.DisableScriptScanning) { throw 'Full Defender protection could not be verified.' }
+    $source = (git -C native-source rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0 -or $source -ne $report.applicationCommit) { throw 'Native source differs from the reviewed commit.' }
+    $builtHash = (Get-FileHash native-source/src-tauri/target/release/mimisync.exe -Algorithm SHA256).Hash.ToLowerInvariant()
     $archive = Join-Path portable-output $archiveName
     $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
     Expand-Archive -LiteralPath $archive -DestinationPath portable-check
     $executable = @(Get-ChildItem portable-check -Recurse -Filter Mimisync.exe)
-    if ($executable.Count -ne 1 -or (Get-FileHash $executable[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '3035f095f9536e472e7725e2aaaeaa50d7e9bc5d2f0299015bcb07aaa2cf8db5') { throw 'Portable executable differs from the reviewed native application.' }
+    if ($executable.Count -ne 1 -or (Get-FileHash $executable[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $builtHash) { throw 'Portable executable differs from the fresh native build.' }
     foreach ($file in @((Get-Item $archive)) + @(Get-ChildItem portable-check -Recurse -File)) {
         $report.files += [ordered]@{ name = $file.FullName.Substring((Get-Location).Path.Length + 1); sha256 = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant(); bytes = $file.Length }
         if ($file.Extension -in @('.exe','.dll','.zip')) { Set-Content -LiteralPath $file.FullName -Stream Zone.Identifier -Value "[ZoneTransfer]`r`nZoneId=3" }
@@ -52,7 +55,7 @@ try {
 
     O backend ainda usa WSL2, Python, FFmpeg e checkpoints. O assistente prepara esses componentes quando necessario, podendo pedir autorizacao de administrador e reinicializacao para o WSL2. Dados ficam no perfil do Windows, fora da pasta portatil. O WebView2 Runtime normalmente ja esta presente no Windows 11.
 
-    O executavel tem os mesmos bytes do preview 2 nativo verificado. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.
+    O executavel foi compilado no Windows a partir do mesmo codigo-fonte verificado do preview 2 nativo, e seus bytes finais foram analisados separadamente. O ZIP e os arquivos extraidos foram analisados com Defender atualizado, protecao em tempo real, de downloads/scripts e em nuvem ativas. O download do GitHub tambem e conferido antes da publicacao. Relatorio e SHA-256 acompanham esta Release.
 
     ZIP SHA-256: $hash
 
