@@ -16,7 +16,7 @@ Aplicativo em desenvolvimento para Windows 11: React + TypeScript + Tauri 2, bac
 
 ## Para abrir e testar no Windows
 
-Baixe o ZIP na [Release 0.2.0](https://github.com/romllr/mimisync/releases/tag/v0.2.0), extraia a pasta inteira e abra **Mimisync.exe**. Mantenha `WebView2Loader.dll` ao lado do executável.
+Baixe o [ZIP Windows 0.2.0](https://github.com/romllr/mimisync/raw/refs/heads/main/downloads/Mimisync-0.2.0-windows-x64-test.zip) ou abra a [Release 0.2.0](https://github.com/romllr/mimisync/releases/tag/v0.2.0), extraia a pasta inteira e abra **Mimisync.exe**. Mantenha `WebView2Loader.dll` ao lado do executável.
 
 **Não precisa abrir CMD, configurar Python, instalar Node/Rust ou preparar o backend manualmente.**
 
