@@ -1,0 +1,13 @@
+{
+  "runId": "38934005447",
+  "reports": {
+    "cloud.json": {
+      "configured": true,
+      "mapsConnectionExitCode": 0,
+      "error": null
+    }
+  },
+  "selectedErrorLines": [
+    "portable\tScan and publish exact portable ZIP\t2026-10-16T16:49:26.1319361Z ^[[31;1mParserError: ^[[0mD:\\a\\mimisync\\mimisync\\scripts\\security\\publish-portable.ps1:63^[[0m"
+  ]
+}
