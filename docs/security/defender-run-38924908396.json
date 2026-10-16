@@ -1,0 +1,46 @@
+{
+  "startedUtc": "2026-10-16T15:33:53.4550218Z",
+  "status": "no_detections_reported_by_this_runner",
+  "executesApplication": false,
+  "engine": {
+    "AMServiceEnabled": true,
+    "AntivirusEnabled": true,
+    "RealTimeProtectionEnabled": false,
+    "AMProductVersion": "4.18.26090.9",
+    "AMEngineVersion": "1.1.26090.9",
+    "AntivirusSignatureVersion": "1.461.56.0",
+    "AntivirusSignatureLastUpdated": "2026-10-16T08:51:17+00:00",
+    "AntivirusSignatureAge": 0,
+    "DefenderSignaturesOutOfDate": false
+  },
+  "files": [
+    {
+      "path": "\\Mimisync-0.2.0-windows-x64-test.zip",
+      "sha256": "2cc6338ba6efaf0dffd48c44237d8d7c259dd59bee54c881bf01cbf504a3d861",
+      "bytes": 9673187,
+      "authenticode": "not_applicable"
+    },
+    {
+      "path": "\\extracted\\Mimisync-0.2.0-windows-x64-test\\Mimisync.exe",
+      "sha256": "346fe9ff9abf65d3fa37fe18443853e674af79b4307c3f262f0fa0fc4c538202",
+      "bytes": 28645689,
+      "authenticode": "NotSigned"
+    },
+    {
+      "path": "\\extracted\\Mimisync-0.2.0-windows-x64-test\\WebView2Loader.dll",
+      "sha256": "86545b66cdb0603bc26b626fb9ad610cb6e71f28d468f5ea66df23b03dda96d5",
+      "bytes": 160880,
+      "authenticode": "Valid"
+    },
+    {
+      "path": "\\native\\Mimisync_0.2.0_x64-setup.exe",
+      "sha256": "657bf25c11d1f75ed14d3f01f6bb7c112558e4fcb73306dc5139a3a1c29b768c",
+      "bytes": 3170256,
+      "authenticode": "NotSigned"
+    }
+  ],
+  "detections": [],
+  "threats": [],
+  "error": null,
+  "completedUtc": "2026-10-16T15:34:01.3870703Z"
+}
