@@ -1,5 +1,7 @@
 # Validação
 
+**Distribuição suspensa:** o Defender do usuário detectou `Trojan:Script/Ulthar.A!ml` no ZIP 0.2.0. Os checks abaixo não comprovam segurança antimalware. Consulte [a investigação](SECURITY-INVESTIGATION.md).
+
 ## Executado nesta máquina Linux sem GPU
 
 - `npm run build`: TypeScript e bundle Vite aprovados.
