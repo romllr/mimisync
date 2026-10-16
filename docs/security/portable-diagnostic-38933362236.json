@@ -1,0 +1,18 @@
+{
+  "runId": "38933362236",
+  "reports": {
+    "cloud.json": {
+      "configured": true,
+      "mapsConnectionExitCode": 0,
+      "error": null
+    }
+  },
+  "selectedErrorLines": [
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:03.6796280Z ^[[36;1mif ($LASTEXITCODE -ne 0) { throw 'Could not retrieve the verified upstream installer.' }^[[0m",
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:03.6797415Z ^[[36;1mif ((Get-FileHash upstream/Mimisync_0.2.0_x64-setup.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'b6ccb14f147a53c5e0e4673a1e26b2091bb1fdf7b1690d70f34a6ebbddadecb0') { throw 'Upstream installer checksum mismatch.' }^[[0m",
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:03.6799051Z ^[[36;1mif ($LASTEXITCODE -ne 0) { throw 'Could not extract the installer without executing it.' }^[[0m",
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:03.6801360Z ^[[36;1mif ($app.Count -ne 1) { throw 'Exactly one reviewed native application must be found.' }^[[0m",
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:22.6212689Z ^[[31;1m^[[0m^[[36;1m^[[36;1m   9 | ^[[0m \u2026 nt -ne 1) { ^[[36;1mthrow 'Exactly one reviewed native application must be fo^[[0m \u2026^[[0m",
+    "portable\tExtract the reviewed native executable without running the installer\t2026-10-16T16:38:22.6217441Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m^[[31;1m^[[31;1m^[[36;1m     | ^[[31;1mExactly one reviewed native application must be found.^[[0m"
+  ]
+}
