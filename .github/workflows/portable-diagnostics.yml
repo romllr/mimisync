@@ -18,7 +18,7 @@ jobs:
           import base64,json,os,re,subprocess
           from pathlib import Path
           repo=os.environ['GITHUB_REPOSITORY']
-          for run in ('38933362236','38933737726'):
+          for run in ('38934005447',):
               folder=Path(run)
               subprocess.run(['gh','run','download',run,'--repo',repo,'--name','windows-portable-security-report','--dir',str(folder)],check=True)
               reports={p.name:json.loads(p.read_text(encoding='utf-8-sig')) for p in folder.glob('*.json')}
