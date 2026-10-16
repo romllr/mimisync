@@ -1,12 +1,14 @@
 param(
     [Parameter(Mandatory=$true)][string]$Root,
-    [Parameter(Mandatory=$true)][string]$Report
+    [Parameter(Mandatory=$true)][string]$Report,
+    [switch]$RequireRealtime
 )
 $ErrorActionPreference = 'Stop'
 $reportData = [ordered]@{
     startedUtc = (Get-Date).ToUniversalTime().ToString('o')
     status = 'not_run'
     executesApplication = $false
+    realtimeRequired = $RequireRealtime.IsPresent
     engine = $null
     files = @()
     detections = @()
@@ -22,6 +24,11 @@ try {
         $reportData.status = 'scanner_unavailable'
         throw 'Microsoft Defender is not enabled on this runner. No malware-free result can be claimed.'
     }
+    if ($RequireRealtime -and -not $status.RealTimeProtectionEnabled) {
+        $reportData.status = 'realtime_protection_unavailable'
+        throw 'Realtime protection could not be enabled; this does not reproduce the client download protection.'
+    }
+    $reportData.cloudSettings = Get-MpPreference | Select-Object MAPSReporting,SubmitSamplesConsent,DisableBlockAtFirstSeen,CloudBlockLevel
     Update-MpSignature
     $status = Get-MpComputerStatus
     $reportData.engine = $status | Select-Object AMServiceEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AMProductVersion,AMEngineVersion,AntivirusSignatureVersion,AntivirusSignatureLastUpdated,AntivirusSignatureAge,DefenderSignaturesOutOfDate
@@ -33,6 +40,11 @@ try {
         throw "The ZIP does not match the reported sample: $hash"
     }
     Expand-Archive -LiteralPath $zip -DestinationPath (Join-Path $Root 'extracted') -Force
+    if ($RequireRealtime) {
+        Get-ChildItem -LiteralPath (Join-Path $Root 'extracted') -Recurse -File | Where-Object { $_.Extension -in @('.exe','.dll') } | ForEach-Object {
+            Set-Content -LiteralPath $_.FullName -Stream Zone.Identifier -Value "[ZoneTransfer]`r`nZoneId=3`r`nHostUrl=https://raw.githubusercontent.com/romllr/mimisync/refs/heads/main/downloads/Mimisync-0.2.0-windows-x64-test.zip"
+        }
+    }
     $files = Get-ChildItem -LiteralPath $Root -Recurse -File | Where-Object { $_.Extension -in @('.zip','.exe','.dll','.ps1','.cmd','.bat','.sh') }
     foreach ($file in $files) {
         $signature = if ($file.Extension -in @('.exe','.dll','.ps1')) { (Get-AuthenticodeSignature -LiteralPath $file.FullName).Status.ToString() } else { 'not_applicable' }
