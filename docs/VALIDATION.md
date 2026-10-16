@@ -44,3 +44,7 @@ O host desta implementação não expõe NVIDIA. O Hugging Face respondeu 403 na
 5. Repetir com LatentSync 1.5 e 1.6 nos requisitos de VRAM correspondentes, respeitando licenças.
 6. Testar cancelamento durante inferência e exportação, fila com dois renders, reinicialização e exportação de resultado.
 7. Comparar parâmetros/presets em conteúdo representativo antes de selecionar defaults para produção.
+
+## Diagnóstico WSL no preview 3
+
+Três testes Rust do protocolo passaram no Linux e no Windows. O novo caso reproduz saída UTF-16 com acentos dividida em pequenos blocos, última linha sem quebra e UTF-8 inválido sem perda das linhas seguintes. Compilação cruzada e nativa Windows aprovadas. O [ZIP final](security/portable-38937903881.json) passou na verificação própria do Defender e do download. A causa da falha de importação no computador do usuário ainda requer seu novo log; não foi reproduzida no CI.

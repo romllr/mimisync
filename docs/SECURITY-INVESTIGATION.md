@@ -107,3 +107,11 @@ O portátil foi compilado com a toolchain Windows nativa a partir do mesmo commi
 - A interface e a inferência CUDA não foram executadas nessa análise; o aplicativo continua experimental e sem assinatura digital.
 
 Tentativas anteriores foram preservadas nos relatórios `portable-diagnostic-*.json`: a extração do instalador não encontrou um único executável com o hash esperado; outra máquina falhou na conexão MAPS (`0x80508015`); um erro de sintaxe no script impediu outra análise de iniciar. Nenhuma dessas tentativas publicou um portátil nem equivale a uma detecção de ameaça. O fluxo final usa compilação direta, atualização de assinaturas e inicialização da política antes do teste de conexão, além de validar a sintaxe dos scripts antes da compilação. O ZIP original bloqueado permanece retirado, sem diagnóstico de falso positivo.
+
+## Portátil preview 3: diagnóstico de preparação WSL
+
+[Release](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-portable.3), [execução 38937903881](https://github.com/romllr/mimisync/actions/runs/38937903881) e [relatório](security/portable-38937903881.json). Fonte `961fe0ddad0ec5c3c9a422e181262bb457dacfbe`.
+
+Esta versão corrige a leitura das mensagens do WSL, que podiam ser descartadas por incompatibilidade UTF-16/UTF-8. Não altera os comandos de instalação nem identifica a causa de importação do computador do usuário. Três testes de protocolo passaram também no Windows; compilação nativa, empacotamento e Defender com as mesmas proteções completas passaram sem detecções. O download do GitHub e os conteúdos extraídos foram analisados antes da publicação. O download público, CRC e todos os hashes do manifesto foram conferidos neste ambiente sem execução do app.
+
+ZIP: `Mimisync-0.2.0-preview3-windows-x64-portable.zip`, 5.613.842 bytes. SHA-256: `bdc1bf536c9fe76a93de2019e3e9db1afd415d2e2ee896b6520016f9e3583d9e`. As limitações de assinatura, GUI/CUDA e do diagnóstico do ZIP original permanecem.

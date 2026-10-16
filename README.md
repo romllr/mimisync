@@ -16,11 +16,13 @@ Aplicativo em desenvolvimento para Windows 11: React + TypeScript + Tauri 2, bac
 
 ## Baixar e testar no Windows 11
 
-[**Baixar ZIP portátil — sem instalar o app**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-portable.2/Mimisync-0.2.0-preview2-windows-x64-portable.zip) · [Relatório e detalhes do portátil](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-portable.2)
+[**Baixar ZIP portátil — sem instalar o app**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-portable.3/Mimisync-0.2.0-preview3-windows-x64-portable.zip) · [Relatório e detalhes do portátil](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-portable.3)
+
+O portátil preview 3 corrige a perda das mensagens de erro do WSL durante a preparação. Se a importação falhar, abra “Detalhes da preparação” e use “Copiar detalhes”; o código `-1` sozinho não identifica a causa. Consulte [o diagnóstico de preparação](docs/SETUP-TROUBLESHOOTING.md).
 
 No portátil, extraia a pasta inteira e abra `Mimisync.exe`. Não execute dentro do ZIP. Ele usa o WebView2 Runtime, normalmente já presente no Windows 11. Os dados continuam no perfil do Windows; o WSL2 e os modelos continuam necessários e são preparados pelo assistente. Portanto, o aplicativo dispensa instalador, mas não elimina as dependências de inferência.
 
-[**Baixar instalador — Windows preview 2**](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-2/Mimisync_0.2.0_x64-setup.exe) · [Release e relatório do Defender](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2)
+[Instalador anterior — Windows preview 2](https://github.com/romllr/mimisync/releases/download/preview-0.2.0-2/Mimisync_0.2.0_x64-setup.exe) · [Release e relatório do Defender](https://github.com/romllr/mimisync/releases/tag/preview-0.2.0-2)
 
 Abra o instalador e depois o Mimisync. O assistente prepara o backend pelo próprio app, sem CMD. Se precisar habilitar o WSL2, o Windows pede autorização de administrador e pode pedir uma reinicialização. Depois, selecione e instale o modelo pela interface; os checkpoints são baixados separadamente após revisão da licença. É necessário driver NVIDIA compatível e espaço para os ambientes e pesos.
 
