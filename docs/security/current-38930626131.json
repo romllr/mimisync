@@ -1,0 +1,50 @@
+{
+  "sourceCommit": "db86b6f1766182d14d7845acc84e74a98836a9be",
+  "runId": "38930626131",
+  "startedUtc": "2026-10-16T16:22:42.9212186Z",
+  "status": "no_detections_realtime_and_cloud_verified_requires_review",
+  "executesApplication": false,
+  "distributionAuthorized": false,
+  "engine": {
+    "AMServiceEnabled": true,
+    "AntivirusEnabled": true,
+    "RealTimeProtectionEnabled": true,
+    "AMProductVersion": "4.18.26090.9",
+    "AMEngineVersion": "1.1.26090.9",
+    "AntivirusSignatureVersion": "1.461.56.0",
+    "AntivirusSignatureLastUpdated": "2026-10-16T08:51:17+00:00",
+    "DefenderSignaturesOutOfDate": false
+  },
+  "protectionEnableError": null,
+  "cloudSettings": {
+    "MAPSReporting": 2,
+    "SubmitSamplesConsent": 1,
+    "DisableBlockAtFirstSeen": false,
+    "CloudBlockLevel": 0,
+    "DisableIOAVProtection": false,
+    "DisableScriptScanning": false
+  },
+  "cloudValidation": {
+    "configured": true,
+    "mapsConnectionExitCode": 0,
+    "error": null
+  },
+  "files": [
+    {
+      "name": "Mimisync_0.2.0_x64-setup.exe",
+      "sha256": "48f6f95a755bf53242c66c18a035e75078bce6840d93702b7bdf2c271b99b206",
+      "bytes": 3171313,
+      "authenticode": "NotSigned"
+    },
+    {
+      "name": "mimisync.exe",
+      "sha256": "b6b28b30ea22797bb7897e56af6aced19630b5c5905097aead0b95c7df6852d5",
+      "bytes": 12748800,
+      "authenticode": "NotSigned"
+    }
+  ],
+  "detections": [],
+  "threats": [],
+  "error": null,
+  "completedUtc": "2026-10-16T16:22:46.7704780Z"
+}
