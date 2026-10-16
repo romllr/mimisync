@@ -1,6 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod setup;
 mod setup_protocol;
+#[cfg(target_os = "windows")]
+mod windows_setup;
 use futures_util::StreamExt;
 use serde::Serialize;
 use std::{

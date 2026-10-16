@@ -48,6 +48,14 @@ Uma execução intermediária com a configuração antiga foi cancelada após id
 
 ## Conclusão atual
 
+### Melhoria da instalação, sem conclusão sobre o alerta
+
+A preparação do Windows passou a chamar diretamente `ShellExecuteExW` com o verbo `runas`, usando o caminho de `wsl.exe` obtido de `GetSystemDirectoryW`. O app não precisa mais iniciar PowerShell nem interpretar uma linha de script para habilitar o WSL. O Windows mantém o diálogo normal de consentimento de administrador. Cancelamento, falha e solicitação de reinício continuam tratados na interface; a preparação do backend continua pelo botão do app.
+
+Esta mudança reduz intermediários e usa a API própria do sistema para elevação. **Não identifica a causa de `Ulthar.A!ml`, não é evidência de falso positivo e não libera um novo executável para download.** A varredura anterior analisou os bytes antigos; não deve ser atribuída a esta alteração. O fluxo de UAC/instalação requer validação em Windows 11 com proteção ativa, indisponível neste ambiente Linux e na tentativa anterior do runner.
+
+Verificação desta alteração: compilação release cruzada `x86_64-pc-windows-gnu`, com `custom-protocol`, dependências travadas e modo offline concluída em 16/10/2026. Nenhum executável foi executado ou republicado. A autenticação GitHub disponível nesta sessão retornou HTTP 401; a consulta Git também ficou sem credenciais, impedindo publicar esta mudança a partir desta sessão.
+
 - O relato do Defender do usuário permanece válido e sem causa esclarecida.
 - O usuário informou que o bloqueio ocorreu durante o download, antes de extrair/abrir o app. Esse registro não demonstra execução do aplicativo no computador dele.
 - Não há diagnóstico suficiente para declarar o pacote seguro ou falso positivo.

@@ -384,10 +384,10 @@ pub fn setup_windows(state: State<Installer>) -> Result<(), String> {
     me.begin()?;
     me.update(|s| s.phase = "windows".into());
     std::thread::spawn(move || {
-        let mut cmd = command("powershell.exe");
-        // Fixed arguments only. Windows owns the administrator consent dialog.
-        cmd.args(["-NoProfile","-NonInteractive","-Command","$ErrorActionPreference='Stop'; $p=Start-Process -FilePath \"$env:SystemRoot\\System32\\wsl.exe\" -ArgumentList '--install','--no-distribution' -Verb RunAs -Wait -PassThru; if ($p.ExitCode -notin @(0,3010)) { exit $p.ExitCode }"]);
-        let result = me.run(cmd);
+        #[cfg(target_os = "windows")]
+        let result = crate::windows_setup::install_wsl();
+        #[cfg(not(target_os = "windows"))]
+        let result: Result<(), String> = Err("Disponível apenas no Windows 11.".into());
         if result.is_ok() {
             me.update(|s| s.phase = "restart".into());
             me.log("Se o Windows solicitou reinicialização, reinicie e abra o Mimisync novamente.");
