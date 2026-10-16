@@ -1,0 +1,32 @@
+name: Preserve existing Defender report
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Investigation run containing the JSON report (no executable download)
+        required: true
+        default: '38924908396'
+permissions:
+  actions: read
+  contents: write
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy existing report into the audit record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name defender-investigation-report --dir report
+          python - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          raw = Path('report/defender.json').read_bytes()
+          json.loads(raw.decode('utf-8-sig'))
+          payload = {'message': 'Record isolated Defender report (run '+os.environ['RUN_ID']+')', 'content': base64.b64encode(raw).decode('ascii')}
+          Path('payload.json').write_text(json.dumps(payload))
+          PY
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/docs/security/defender-run-$RUN_ID.json" --input payload.json --jq '{path: .content.path, commit: .commit.sha}'
