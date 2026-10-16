@@ -46,6 +46,14 @@ A etapa que exigia habilitar a proteção em tempo real falhou. Como consequênc
 
 Uma execução intermediária com a configuração antiga foi cancelada após identificar que a atualização do workflow ainda não estava no branch remoto; ela não é contada como análise adicional.
 
+### App atualizado: proteção em tempo real ativa, nuvem desativada
+
+[Execução 38929665537](https://github.com/romllr/mimisync/actions/runs/38929665537) e [relatório JSON](security/current-38929665537.json).
+
+O código atualizado foi compilado no Windows com a toolchain nativa. O instalador e o executável foram analisados sem execução. O Defender estava atualizado e com proteção em tempo real ativa; não houve detecções. Entretanto, `MAPSReporting=0` e `DisableBlockAtFirstSeen=true`: a proteção em nuvem não estava ativa. Este teste não esclarece o bloqueio original por `Ulthar.A!ml`.
+
+Uma verificação adicional foi preparada com proteção em tempo real, proteção de downloads/scripts, MAPS e bloqueio à primeira vista habilitados no runner isolado. Ela exige que `MpCmdRun -ValidateMapsConnection` confirme a conexão com o serviço da Microsoft. O consentimento de envio de amostras seguras é restrito a esse runner, que contém código público do projeto, sem os vídeos do usuário. Se esses requisitos não forem verificáveis, o relatório deve indicar a limitação e falhar, sem publicar executáveis.
+
 ## Conclusão atual
 
 ### Melhoria da instalação, sem conclusão sobre o alerta
