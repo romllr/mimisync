@@ -20,6 +20,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 38923658646 --repo romllr/mimisync --name Mimisync-Windows-installer --dir scan-input/native
       - name: Scan exact samples with Microsoft Defender
+        if: always()
         shell: pwsh
         run: ./scripts/security/defender-scan.ps1 -Root scan-input -Report scan-report/defender.json
       - name: Preserve the report, never the executables

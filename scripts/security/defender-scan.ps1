@@ -10,6 +10,7 @@ $reportData = [ordered]@{
     engine = $null
     files = @()
     detections = @()
+    threats = @()
     error = $null
 }
 $exitCode = 1
@@ -59,6 +60,10 @@ try {
     } catch { }
     Write-Warning $reportData.error
 } finally {
+    try {
+        $ids = @($reportData.detections | ForEach-Object { $_.ThreatID })
+        $reportData.threats = @(Get-MpThreat | Where-Object { $_.ThreatID -in $ids } | Select-Object ThreatID,ThreatName,SeverityID,CategoryID)
+    } catch { }
     $reportData.completedUtc = (Get-Date).ToUniversalTime().ToString('o')
     $directory = Split-Path -Parent $Report
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
