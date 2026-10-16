@@ -1,0 +1,35 @@
+name: Preserve portable validation diagnostics
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/portable-diagnostics.yml]
+permissions:
+  actions: read
+  contents: write
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preserve JSON reports and selected errors only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,re,subprocess
+          from pathlib import Path
+          repo=os.environ['GITHUB_REPOSITORY']
+          for run in ('38933362236','38933737726'):
+              folder=Path(run)
+              subprocess.run(['gh','run','download',run,'--repo',repo,'--name','windows-portable-security-report','--dir',str(folder)],check=True)
+              reports={p.name:json.loads(p.read_text(encoding='utf-8-sig')) for p in folder.glob('*.json')}
+              logs=subprocess.run(['gh','run','view',run,'--repo',repo,'--log-failed'],capture_output=True,text=True,check=True).stdout
+              errors=[]
+              for line in logs.splitlines():
+                  if re.search(r'Could not|Exactly one|checksum mismatch|not recognized|not found|ERROR:|Can not open|No files to process|cannot be found|not a supported archive',line,re.I):
+                      line=re.sub(r'https?://\S+','[URL omitted]',line)
+                      errors.append(line[-600:])
+              raw=json.dumps({'runId':run,'reports':reports,'selectedErrorLines':errors[-12:]},indent=2).encode()
+              payload={'message':'Preserve portable diagnostics '+run,'content':base64.b64encode(raw).decode()}
+              path=folder/'payload.json';path.write_text(json.dumps(payload))
+              subprocess.run(['gh','api','--method','PUT',f'repos/{repo}/contents/docs/security/portable-diagnostic-{run}.json','--input',str(path),'--jq','.content.path'],check=True)
+          PY
