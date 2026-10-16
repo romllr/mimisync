@@ -1,0 +1,13 @@
+{
+  "runId": "38933737726",
+  "reports": {
+    "cloud.json": {
+      "configured": false,
+      "mapsConnectionExitCode": -2142207979,
+      "error": "Defender cloud connection verification failed."
+    }
+  },
+  "selectedErrorLines": [
+    "portable\tEnable and verify Defender protection\t2026-10-16T16:40:26.0817540Z ERROR: ValidateMapsConnection failed (0x80508015)"
+  ]
+}
