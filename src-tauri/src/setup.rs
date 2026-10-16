@@ -1,10 +1,10 @@
-use crate::setup_protocol::{checksum, decode};
+use crate::setup_protocol::{checksum, decode, read_log_stream};
 use futures_util::StreamExt;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::{
     fs,
-    io::{BufRead, BufReader, Read},
+    io::Read,
     path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{Arc, Mutex},
@@ -292,27 +292,41 @@ impl Installer {
             .stderr(Stdio::piped())
             .spawn()
             .map_err(|e| e.to_string())?;
-        let error = child.stderr.take().unwrap();
-        let me = self.clone();
-        let reader = std::thread::spawn(move || {
-            for line in BufReader::new(error).lines().map_while(Result::ok) {
-                me.log(line);
+        let tail = Arc::new(Mutex::new(Vec::<String>::new()));
+        let emit = {
+            let me = self.clone();
+            let tail = tail.clone();
+            move |line: String| {
+                me.log(line.clone());
+                if let Ok(mut lines) = tail.lock() {
+                    lines.push(line);
+                    if lines.len() > 32 {
+                        lines.remove(0);
+                    }
+                }
             }
-        });
-        for line in BufReader::new(child.stdout.take().unwrap())
-            .lines()
-            .map_while(Result::ok)
-        {
-            self.log(line);
-        }
+        };
+        let error = child.stderr.take().unwrap();
+        let stderr_emit = emit.clone();
+        let reader = std::thread::spawn(move || read_log_stream(error, stderr_emit));
+        let stdout_result = read_log_stream(child.stdout.take().unwrap(), emit);
         let status = child.wait().map_err(|e| e.to_string())?;
-        let _ = reader.join();
+        let stderr_result = reader
+            .join()
+            .map_err(|_| "Falha ao coletar a saída da instalação.".to_owned())?;
         if !status.success() {
-            return Err(format!(
-                "A instalação parou (código {}). Veja os detalhes e tente novamente.",
-                status.code().unwrap_or(-1)
-            ));
+            let code = status
+                .code()
+                .map(|c| format!("{c} / 0x{:08X}", c as u32))
+                .unwrap_or_else(|| "indisponível".into());
+            let details = tail
+                .lock()
+                .map(|lines| lines.join("\n"))
+                .unwrap_or_default();
+            return Err(format!("A instalação parou (código {code}).\n{details}"));
         }
+        stdout_result.map_err(|e| format!("Não foi possível ler a saída da instalação: {e}"))?;
+        stderr_result.map_err(|e| format!("Não foi possível ler os erros da instalação: {e}"))?;
         Ok(())
     }
 }
