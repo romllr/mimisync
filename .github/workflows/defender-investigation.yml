@@ -1,0 +1,31 @@
+name: Defender investigation (no application execution)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  defender:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Recover the exact reported ZIP without executing it
+        run: python scripts/security/stage-reported.py
+      - name: Download the previously built native installer for comparison
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 38923658646 --repo romllr/mimisync --name Mimisync-Windows-installer --dir scan-input/native
+      - name: Scan exact samples with Microsoft Defender
+        shell: pwsh
+        run: ./scripts/security/defender-scan.ps1 -Root scan-input -Report scan-report/defender.json
+      - name: Preserve the report, never the executables
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: defender-investigation-report
+          path: scan-report/*.json
+          if-no-files-found: warn
