@@ -1,0 +1,12 @@
+{
+  "startedUtc": "2026-10-16T15:42:52.5563437Z",
+  "status": "scan_incomplete",
+  "executesApplication": false,
+  "realtimeRequired": true,
+  "engine": null,
+  "files": [],
+  "detections": [],
+  "threats": [],
+  "error": "Cannot find path 'D:\\a\\mimisync\\mimisync\\scan-input' because it does not exist.",
+  "completedUtc": "2026-10-16T15:42:54.6926305Z"
+}
